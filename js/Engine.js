@@ -1,4 +1,5 @@
 class Engine{
+    #drawer;
     #rows;
     #cols;
     #maxPlayers;
@@ -15,9 +16,10 @@ class Engine{
         ["P4", "P4", "0", "0", "X", "H4", "X", "0", "0", "P3", "P3"],
         ["P4", "P4", "0", "0", "S4", "X", "X", "0", "0", "P3", "P3"]
     ];
+    #observers = []; // Array to hold observer functions
 
-    constructor(){
-
+    constructor(drawer){
+        this.#drawer = drawer;
         console.log("engine constructor");
         
         this.#rows = this.#gameDesk.length;
@@ -28,9 +30,32 @@ class Engine{
         console.log("Sloupců: " + this.#gameDesk[0].length);
         console.log("Max hráčů: " + this.#maxPlayers);
 
-        this.drawGame();
+        // this.drawGame();
+    }
+
+    getGameDesk(){
+        return this.#gameDesk;
+    }
+    getCols(){
+        return this.#cols;
+    }
+    getRows(){
+        return this.#rows;
     }
         
+    updateGameDesk(newDesk) {
+        this.#gameDesk = newDesk;
+        this.notifyObservers(); // Notify observers of the change
+    }
+
+    addObserver(observer) {
+        this.#observers.push(observer);
+    }
+
+    notifyObservers() {
+        this.#observers.forEach(observer => observer());
+    }
+
     getMaxPlayers(){
         let uniq = new Set();
         let regex = /^P[1-9]$/;
@@ -44,29 +69,6 @@ class Engine{
         return uniq.size;
     }
 
-    drawGame(){
-        let canvas = document.getElementById("gameDesk");
-        let ctx = canvas.getContext("2d");
-
-        let width = canvas.offsetWidth;
-        let height = canvas.offsetHeight;
-        console.log("Canvas size: " + width + "x" + height);
-        let cellSizeCoefficient = 0.8;
-        width = width / this.#cols;
-        height = height / this.#rows;
-        console.log("Cell size: " + width + "x" + height);
-
-        for (let i = 0; i < this.#rows; i++) {
-            for (let j = 0; j < this.#cols; j++) {
-                if (this.#gameDesk[i][j] != "0"){
-                    console.log(this.#gameDesk[i][j]);
-                    ctx.beginPath();
-                    ctx.arc(i*width + width/2, j*height + height/2, width*cellSizeCoefficient/2, 0, 2 * Math.PI);
-                    ctx.stroke();
-                }
-            }
-        }
-    }
 
 
 
