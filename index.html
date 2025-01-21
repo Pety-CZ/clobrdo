@@ -4,13 +4,26 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/Engine.js"></script>
     <title>Člobrdo</title>
 </head>
 <body>
     <h1>Člověče, nezlob se!</h1>
-    <canvas id="myCanvas" width="1100" height="1100" style="border:1px solid #000000;">
+    <!-- <div>
+        <input type="file" name="inputfile" id="inputfile">
+        <br>
         
+        <pre id="output"></pre>
+    </div> -->
+    <canvas id="gameDesk" width="1100" height="1100" style="border:1px solid #000000;">
+        Prohlížeč nepodporuje HTML5 pláno! /
+        Your browser does not support HTML5 canvas.
     </canvas>
     <button>Hod kostkou</button>
+
+    <script type="text/javascript">
+        const engine = new Engine();
+        // engine.loadLayout();
+    </script>
 </body>
 </html>
