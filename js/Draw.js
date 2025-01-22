@@ -88,8 +88,8 @@ export class Draw{
                 let element = this.#gameDesk[i][j];
                 if (element == "P1" || element == "P2" || element == "P3" || element == "P4"){
                     let color = element;
-                    let x = j;
-                    let y = i;
+                    let x = j * (this.#width / this.#cols) + (this.#width / this.#cols) / 2;
+                    let y = i * (this.#height / this.#rows) + (this.#height / this.#rows) / 2;
                     let size = this.#size * 0.5;
                     // this.#figure_array.push([color, x, y]);
                     this.#figure_array.push(new Fig(color, x, y, size));
@@ -169,8 +169,8 @@ export class Draw{
                 let size = fig.getSize();
 
                 let player = fig.getPlayer();
-                let x = fig.getX() * (this.#width / this.#cols) + (this.#width / this.#cols)/2;
-                let y = fig.getY() * (this.#height / this.#rows) + (this.#width / this.#cols) / 2;
+                let x = fig.getX();
+                let y = fig.getY();
 
                 ctx.beginPath();
                 ctx.arc(x, y, size, 0, 2 * Math.PI);
@@ -200,11 +200,14 @@ export class Draw{
         for (let i = 0; i < figure_array.length; i++) {
             
             const fig = figure_array[i];
-            const size = fig.getSize(); // Velikost figurky
-            const figX = fig.getX() * (this.#width / this.#cols) + (this.#width / this.#cols) / 2 - size;
-            const figY = fig.getY() * (this.#height / this.#rows) + (this.#height / this.#rows) / 2 - size;
+            const size = fig.getSize();
 
+            const figX = fig.getX();
+            const figY = fig.getY();
+
+            // Is mouse over any figure?
             if (Math.sqrt((x - figX) ** 2 + (y - figY) ** 2) < size) {
+                fig.setOldPosition(figX, figY);
                 this.#draggingFig = fig;
                 this.#offsetX = x - figX;
                 this.#offsetY = y - figY;
@@ -221,8 +224,8 @@ export class Draw{
 
             const figSize = this.#draggingFig.getSize();
 
-            this.#draggingFig.setX( (x - figSize ) / (this.#width / this.#cols) );
-            this.#draggingFig.setY( (y - figSize ) / (this.#height / this.#rows) );
+            this.#draggingFig.setX(x);
+            this.#draggingFig.setY(y);
 
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
             this.drawGameBoard();
@@ -231,31 +234,45 @@ export class Draw{
     }
 
     onMouseUp(event) {
+
+        if (this.#draggingFig) {
+            // Get relative mouse coordinates between page and canvas
+            const rect = this.#canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            // Calculate cell size of game board grid
+            const fieldWidth = this.#width / this.#cols;
+            const fieldHeight = this.#height / this.#rows;
+
+            // Calculate the nearest cell coordinates
+            // Using "floor" instead of "round", because it works more consistently
+            const closestCol = Math.floor(x / fieldWidth);
+            const closestRow = Math.floor(y / fieldHeight);
+
+
+            // Calculate the center of the target cell
+            const targetX = (closestCol + 0.5) * fieldWidth;
+            const targetY = (closestRow + 0.5) * fieldHeight;
+
+            //Snap the figure to the center of the nearest cell
+            // this.#draggingFig.setX(targetX);
+            // this.#draggingFig.setY(targetY);
+
+            if (this.#gameDesk[closestRow][closestCol] !== "0") { // Check against "0"
+                // Snap the figure to the center of the valid target cell
+                this.#draggingFig.setX(targetX);
+                this.#draggingFig.setY(targetY);
+            } else {
+                this.#draggingFig.resetOldPosition();
+                // Return the figure to its original position - but only temporary fix for demonstration
+                // In future implementation, probably consider the closest VALID position
+            }
+
+            this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+            this.drawGameBoard();
+            this.drawFigures();
+        }
         this.#draggingFig = null;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    bindDrawBoard(handler){
-        document.getElementById("render").addEventListener('click', () => {
-            handler();
-        })
-        document.addEventListener(onload, () => {
-            handler();
-        })
     }
 }

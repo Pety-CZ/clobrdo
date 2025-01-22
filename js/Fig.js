@@ -1,13 +1,15 @@
 export class Fig{
     #player;
+    #oldX;
+    #oldY;
     #x_pos;
     #y_pos;
     #size;
 
-    constructor(player, x_pos, y_pos, size){
+    constructor(player, x, y, size){
         this.#player = player;
-        this.#x_pos = x_pos;
-        this.#y_pos = y_pos;
+        this.#x_pos = x;
+        this.#y_pos = y;
         this.#size = size;
     }
 
@@ -30,4 +32,14 @@ export class Fig{
     setY(y){
         this.#y_pos = y;
     }
+
+    resetOldPosition(){
+        this.#x_pos = this.#oldX;
+        this.#y_pos = this.#oldY;
+    }
+    setOldPosition(x,y) {
+        this.#oldX = x;
+        this.#oldY = y;
+    }
+
 }
