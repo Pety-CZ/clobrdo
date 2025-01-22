@@ -31,7 +31,7 @@ export class Draw{
         ["0", "0", "0", "0", "X", "H2", "X", "0", "0", "0", "0"],
         ["0", "0", "0", "0", "X", "H2", "X", "0", "0", "0", "0"],
         ["S1", "X", "X", "X", "X", "H2", "X", "X", "X", "X", "X"],
-        ["X", "H1", "H1", "H1", "H1", "F3", "H3", "H3", "H3", "H3", "X"],
+        ["X", "H1", "H1", "H1", "H1", "0", "H3", "H3", "H3", "H3", "X"],
         ["X", "X", "X", "X", "X", "H4", "X", "X", "X", "X", "S3"],
         ["0", "0", "0", "0", "X", "H4", "X", "0", "0", "0", "0"],
         ["0", "0", "0", "0", "X", "H4", "X", "0", "0", "0", "0"],
@@ -72,11 +72,10 @@ export class Draw{
 
     getMaxPlayers() {
         let uniq = new Set();
-        let regex = /^P[1-9]$/;
         for (let i = 0; i < this.#gameDesk.length; i++) {
             for (let j = 0; j < this.#gameDesk[i].length; j++) {
                 let element = this.#gameDesk[i][j];
-                if (regex.test(element))
+                if (this.#regexPlayer.test(element))
                     uniq.add(this.#gameDesk[i][j]);
             }
         }
@@ -255,18 +254,25 @@ export class Draw{
             const targetX = (closestCol + 0.5) * fieldWidth;
             const targetY = (closestRow + 0.5) * fieldHeight;
 
-            //Snap the figure to the center of the nearest cell
-            // this.#draggingFig.setX(targetX);
-            // this.#draggingFig.setY(targetY);
-
-            if (this.#gameDesk[closestRow][closestCol] !== "0") { // Check against "0"
-                // Snap the figure to the center of the valid target cell
+            // Snap the figure to the center of the nearest cell
+            let dropPosition = this.#gameDesk[closestRow][closestCol];
+            let dropPositionColor = this.getPlayerColor(dropPosition)
+            let figColor = this.getPlayerColor(this.#draggingFig.getPlayer());
+ 
+            
+            if (this.#regexHome.test(dropPosition) || this.#regexPlayer.test(dropPosition)) {   // Check if figure is placed in correct home
+                if (dropPositionColor === figColor) {    // Snap the figure to the center of the valid target cell
+                    this.#draggingFig.setX(targetX);
+                    this.#draggingFig.setY(targetY);
+                    console.log("Home field");
+                } else{
+                    this.#draggingFig.resetOldPosition();
+                }
+            } else if (dropPosition !== "0") {          // Check if figure is placed in correct start
                 this.#draggingFig.setX(targetX);
                 this.#draggingFig.setY(targetY);
             } else {
                 this.#draggingFig.resetOldPosition();
-                // Return the figure to its original position - but only temporary fix for demonstration
-                // In future implementation, probably consider the closest VALID position
             }
 
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
