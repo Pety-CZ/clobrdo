@@ -1,4 +1,7 @@
-class Engine{
+import { Draw } from "./Draw.js";
+import { Fig } from "./Fig.js";
+
+export class Engine{
     #figure_array = [];
     #rows;
     #cols;
@@ -16,9 +19,9 @@ class Engine{
         ["P4", "P4", "0", "0", "X", "H4", "X", "0", "0", "P3", "P3"],
         ["P4", "P4", "0", "0", "S4", "X", "X", "0", "0", "P3", "P3"]
     ];
-    #observers = []; // Array to hold observer functions
+    // #observers = []; // Array to hold observer functions
 
-    constructor(){
+    constructor(canvas){
         console.log("engine constructor");
         
         this.#rows = this.#gameDesk.length;
@@ -57,13 +60,13 @@ class Engine{
         this.notifyObservers(); // Notify observers of the change
     }
 
-    addObserver(observer) {
-        this.#observers.push(observer);
-    }
+    // addObserver(observer) {
+    //     this.#observers.push(observer);
+    // }
 
-    notifyObservers() {
-        this.#observers.forEach(observer => observer());
-    }
+    // notifyObservers() {
+    //     this.#observers.forEach(observer => observer());
+    // }
 
     getMaxPlayers(){
         let uniq = new Set();
@@ -86,12 +89,13 @@ class Engine{
                     let color = element;
                     let x = j;
                     let y = i;
-                    this.#figure_array.push([color, x, y]);
+                    // let size = Draw.getSize();
+                    this.#figure_array.push(new Fig([color, x, y]));
+
                 }
             }
         }
     }
-
     snapFigure(){
 
     }
