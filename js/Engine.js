@@ -1,5 +1,5 @@
 class Engine{
-    #drawer;
+    #figure_array = [];
     #rows;
     #cols;
     #maxPlayers;
@@ -9,7 +9,7 @@ class Engine{
         ["0", "0", "0", "0", "X", "H2", "X", "0", "0", "0", "0"],
         ["0", "0", "0", "0", "X", "H2", "X", "0", "0", "0", "0"],
         ["S1", "X", "X", "X", "X", "H2", "X", "X", "X", "X", "X"],
-        ["X", "H1", "H1", "H1", "H1", "0", "H3", "H3", "H3", "H3", "X"],
+        ["X", "H1", "H1", "H1", "H1", "F3", "H3", "H3", "H3", "H3", "X"],
         ["X", "X", "X", "X", "X", "H4", "X", "X", "X", "X", "S3"],
         ["0", "0", "0", "0", "X", "H4", "X", "0", "0", "0", "0"],
         ["0", "0", "0", "0", "X", "H4", "X", "0", "0", "0", "0"],
@@ -18,8 +18,7 @@ class Engine{
     ];
     #observers = []; // Array to hold observer functions
 
-    constructor(drawer){
-        this.#drawer = drawer;
+    constructor(){
         console.log("engine constructor");
         
         this.#rows = this.#gameDesk.length;
@@ -30,7 +29,9 @@ class Engine{
         console.log("Sloupců: " + this.#gameDesk[0].length);
         console.log("Max hráčů: " + this.#maxPlayers);
 
-        // this.drawGame();
+        // this.#figure_array.push(["P1", 5, 5]);
+        this.createFigures();
+
     }
 
     getGameDesk(){
@@ -41,6 +42,14 @@ class Engine{
     }
     getRows(){
         return this.#rows;
+    }
+
+    setFigure(Fig){
+        this.#figure_array.push(Fig);
+    }
+
+    getFigures(){
+        return this.#figure_array;
     }
         
     updateGameDesk(newDesk) {
@@ -68,6 +77,26 @@ class Engine{
         }
         return uniq.size;
     }
+
+    createFigures(){
+        for (let i = 0; i < this.#gameDesk.length; i++) {
+            for (let j = 0; j < this.#gameDesk[i].length; j++) {
+                let element = this.#gameDesk[i][j];
+                if (element == "P1" || element == "P2" || element == "P3" || element == "P4"){
+                    let color = element;
+                    let x = j;
+                    let y = i;
+                    this.#figure_array.push([color, x, y]);
+                }
+            }
+        }
+    }
+
+    snapFigure(){
+
+    }
+
+
 
 
 

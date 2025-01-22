@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/Fig.js"></script>
     <script src="js/Engine.js"></script>
     <script src="js/Draw.js"></script>
     <script src="js/Controller.js"></script>
@@ -26,10 +27,12 @@
     <button>Hod kostkou</button>
 
     <script type="text/javascript">
+        const fig = new Fig();
         const engine = new Engine();
-        const draw = new Draw(engine);
+        const draw = new Draw(engine, fig);
         const controller = new Controller(engine, draw);
-        // engine.loadLayout();
+
+        draw.drawGameBoard();
     </script>
 </body>
 </html>

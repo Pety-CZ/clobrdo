@@ -2,14 +2,18 @@ class Controller{
     #engine;
     #draw;
 
+
     constructor(engine, draw){
         this.#engine = engine;
         this.#draw = draw;
 
-        this.#draw.bindDrawGame(this.handleDrawGame);
+        this.#draw.bindDrawBoard(this.handleDrawBoard);
+        // this.#draw.bindDrawFigure(this.handleDrawFigure);
+
     }
 
-    handleDrawGame = () => {
-        this.#draw.drawGame();
+    handleDrawBoard = () => {
+        this.#draw.drawGameBoard();
     }
+
 }
