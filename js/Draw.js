@@ -1,9 +1,12 @@
 import { Fig } from './Fig.js';
+import { Dice } from './Dice.js';
+
 export class Draw{
     #engine;
     #canvas;
     #ctx;
     #fig;
+    #dice;
     #cols;
     #rows;
     #width;
@@ -40,6 +43,7 @@ export class Draw{
     ];
     
     constructor(canvas){
+        this.#dice = new Dice();
         this.#canvas = canvas;
         this.#ctx = this.#canvas.getContext("2d");
 
@@ -258,26 +262,33 @@ export class Draw{
             let dropPosition = this.#gameDesk[closestRow][closestCol];
             let dropPositionColor = this.getPlayerColor(dropPosition)
             let figColor = this.getPlayerColor(this.#draggingFig.getPlayer());
+
+            let validMove;
  
             
             if (this.#regexHome.test(dropPosition) || this.#regexPlayer.test(dropPosition)) {   // Check if figure is placed in correct home
-                if (dropPositionColor === figColor) {    // Snap the figure to the center of the valid target cell
+                if (dropPositionColor === figColor) {    // Snap the figure to the center of the correct home cell
                     this.#draggingFig.setX(targetX);
                     this.#draggingFig.setY(targetY);
                     console.log("Home field");
+                    validMove = true;
                 } else{
                     this.#draggingFig.resetOldPosition();
+                    validMove = false;
                 }
             } else if (dropPosition !== "0") {          // Check if figure is placed in correct start
                 this.#draggingFig.setX(targetX);
                 this.#draggingFig.setY(targetY);
+                validMove = true;
             } else {
                 this.#draggingFig.resetOldPosition();
+                validMove = false;
             }
 
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
             this.drawGameBoard();
             this.drawFigures();
+            (validMove) ? this.#dice.rollDice(): null;
         }
         this.#draggingFig = null;
     }
