@@ -47,8 +47,9 @@ export class Draw{
         this.#canvas = canvas;
         this.#ctx = this.#canvas.getContext("2d");
 
-        this.#width = this.#canvas.offsetWidth;
-        this.#height = this.#canvas.offsetHeight;
+        // this.#width = this.#canvas.offsetWidth;
+        // this.#height = this.#canvas.offsetHeight;
+        this.checkCanvasSize();
 
        // old ENGINE
         console.log(" old engine constructor");
@@ -66,6 +67,14 @@ export class Draw{
         // this.#figure_array.push(["P1", 5, 5]);
         this.createFigures();
         this.drawGameBoard();
+    }
+
+    checkCanvasSize(){
+        let canvasSize = Math.min(this.#canvas.offsetWidth, this.#canvas.offsetHeight);
+        this.#width = canvasSize;
+        this.#height = canvasSize;
+
+        console.log("Width: " + this.#width + " Height: " + this.#height);
     }
 
     getMaxPlayers() {
@@ -131,23 +140,21 @@ export class Draw{
                         ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, cellSize, 0, 2 * Math.PI);
                         ctx.fillStyle = this.getPlayerColor(field);
                         ctx.strokeStyle = this.getPlayerColor(field);
-                        ctx.lineWidth = 12;
-                        // ctx.fill();
+                        ctx.lineWidth = cellSize/2;
                     } else if (this.#regexStart.test(field)){
                         ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, cellSize, 0, 2 * Math.PI);
                         ctx.fillStyle = this.getPlayerColor(field);
                         ctx.strokeStyle = this.getPlayerColor(field);
-                        ctx.lineWidth = 12;
+                        ctx.lineWidth = cellSize/4;
                         ctx.fillStyle = "lightgrey";
                         ctx.fill();
-                        // ctx.fill();
                     }
                     else if (field == "X"){
                         ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, cellSize, 0, 2 * Math.PI);
                         ctx.strokeStyle = "black";
                         ctx.fillStyle = "lightgrey";
                         ctx.fill();
-                        ctx.lineWidth = 4;
+                        ctx.lineWidth = cellSize/8;
                     }
                     ctx.stroke();
                 }
@@ -157,11 +164,9 @@ export class Draw{
     }
 
     renderFigures(){
-        // console.log(vardump(this.#engine.figure_array));
         let ctx = this.#ctx;
         let figure_array = this.#figure_array;
         for (let i = 0; i < figure_array.length; i++) {
-            // for (let j = 0; j < figure_array[i].length; j++) {
                 let fig = figure_array[i];
                 let cellSize = fig.getSize();
 
@@ -174,7 +179,7 @@ export class Draw{
                 ctx.fillStyle = this.getPlayerColor(player);
                 ctx.fill();
                 ctx.strokeStyle = "black";
-                ctx.lineWidth = 10;
+                ctx.lineWidth = cellSize/2;
                 ctx.stroke();
         }
         
@@ -193,6 +198,7 @@ export class Draw{
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
+        // Is mouse over any figure?
         const figure_array = this.#figure_array;
         for (let i = 0; i < figure_array.length; i++) {
             
@@ -202,7 +208,7 @@ export class Draw{
             const figX = fig.getX();
             const figY = fig.getY();
 
-            // Is mouse over any figure?
+            // check if mouse is inside of figure radius
             if (Math.sqrt((x - figX) ** 2 + (y - figY) ** 2) < cellSize) {
                 fig.setOldPosition(figX, figY);
                 this.#draggingFig = fig;

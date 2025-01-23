@@ -1,13 +1,26 @@
+html, body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
 .center{
     margin-left: auto;
     margin-right: auto;
 }
-
+#container{
+    display: flex;
+    justify-content: center;
+}
 #gameDesk{
     float: left;
-    width: auto;
+    /* width: auto; */
+    /* height: 100vh;
+    width: 100vh; */
 }
 #dice{
-    float: left;
-    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* float: left;
+    width: 100%; */
 }

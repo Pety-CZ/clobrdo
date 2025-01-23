@@ -1,7 +1,10 @@
 import { Draw } from './js/Draw.js';
 
 const canvas = document.getElementById("gameDesk");
-canvas.style.height = document.height;
+// canvas.style.height = document.height;
+canvas.style.width = window.innerHeight;
+canvas.style.height = window.innerHeight;
+
 
 
 const draw = new Draw(canvas);
