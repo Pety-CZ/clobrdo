@@ -1,8 +1,13 @@
-#tabletop{
-    height: 90%;
-    width: auto;
-}
 .center{
     margin-left: auto;
     margin-right: auto;
+}
+
+#gameDesk{
+    float: left;
+    width: auto;
+}
+#dice{
+    float: left;
+    width: auto;
 }

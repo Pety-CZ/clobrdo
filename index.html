@@ -4,36 +4,30 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="js/Fig.js"></script>
-    <script src="js/Engine.js" type="module"></script>
-    <script src="js/Draw.js"></script>
-    <script src="js/Controller.js"></script> -->
+
     <title>Člobrdo</title>
 </head>
 <body>
-    <h1>Člověče, nezlob se!</h1>
+    <!-- <h1>Člověče, nezlob se!</h1> -->
     <!-- <div>
         <input type="file" name="inputfile" id="inputfile">
         <br>
         
         <pre id="output"></pre>
     </div> -->
-    <button id="render">Render</button><br>
     <div id="text"></div>
-    <canvas id="gameDesk" width="1100" height="1100" style="border:1px solid #000000;">
-        Tento prohlížeč nepodporuje HTML5 pláno! /
-        Your browser does not support HTML5 canvas.
-    </canvas>
-    <button>Hod kostkou</button>
+    <div id="canvas">
+        <canvas id="gameDesk" width="1100" height="1100" style="border:1px solid #000000;">
+            Tento prohlížeč nepodporuje HTML5 pláno! /
+            Your browser does not support HTML5 canvas.
+        </canvas>
+    </div>
+    <div id="dice">
+        <img src="sprites/dice/1.png" alt="">
+    </div>
+    <!-- <button>Hod kostkou</button> -->
 
-    <!-- <script type="text/javascript">
-        const fig = new Fig();
-        const engine = new Engine();
-        const draw = new Draw(engine, fig);
-        const controller = new Controller(engine, draw);
 
-        draw.drawGameBoard();
-    </script> -->
     <script src="main.js" type="module"></script>
 </body>
 </html>
