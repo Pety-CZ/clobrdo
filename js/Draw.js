@@ -11,7 +11,7 @@ export class Draw{
     #rows;
     #width;
     #height;
-    #size;
+    #cellSize;
 
     #draggingFig = null;
     #offsetX = 0;
@@ -50,19 +50,13 @@ export class Draw{
         this.#width = this.#canvas.offsetWidth;
         this.#height = this.#canvas.offsetHeight;
 
-        
-        this.#canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-        this.#canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.#canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-        
-          
-        // ENGINE
+       // old ENGINE
         console.log(" old engine constructor");
         
         this.#rows = this.#gameDesk.length;
         this.#cols = this.#gameDesk[0].length;
         this.#maxPlayers = this.getMaxPlayers();
-        this.#size = this.#width / 2 / this.#cols;
+        this.#cellSize = this.#width / 2 / this.#cols;
 
 
         console.log("Řádků: " + this.#gameDesk.length);
@@ -83,7 +77,7 @@ export class Draw{
                     uniq.add(this.#gameDesk[i][j]);
             }
         }
-        return uniq.size;
+        return uniq.cellSize;
     }
     createFigures(){
         for (let i = 0; i < this.#gameDesk.length; i++) {
@@ -93,9 +87,9 @@ export class Draw{
                     let color = element;
                     let x = j * (this.#width / this.#cols) + (this.#width / this.#cols) / 2;
                     let y = i * (this.#height / this.#rows) + (this.#height / this.#rows) / 2;
-                    let size = this.#size * 0.5;
+                    let cellSize = this.#cellSize * 0.5;
                     // this.#figure_array.push([color, x, y]);
-                    this.#figure_array.push(new Fig(color, x, y, size));
+                    this.#figure_array.push(new Fig(color, x, y, cellSize));
 
                 }
             }
@@ -103,7 +97,7 @@ export class Draw{
     }
 
     getSize(){
-        return this.#size;
+        return this.#cellSize;
     }
 
     drawGameBoard() {
@@ -117,10 +111,10 @@ export class Draw{
         let fieldWidth = this.#width / this.#cols;
         let fieldHeight = this.#height / this.#rows;
         let cellSizeCoefficient = 0.8;
-        let size = this.#size * cellSizeCoefficient;
-        // console.log("Canvas size: " + this.#width + "x" + this.#height);
-        // console.log("Cell size: " + fieldWidth + "x" + fieldHeight);
-        // console.log("Field size: " + this.#size);
+        let cellSize = this.#cellSize * cellSizeCoefficient;
+        // console.log("Canvas cellSize: " + this.#width + "x" + this.#height);
+        // console.log("Cell cellSize: " + fieldWidth + "x" + fieldHeight);
+        // console.log("Field cellSize: " + this.#cellSize);
         
         for (let i = 0; i < this.#rows; i++) {
             for (let j = 0; j < this.#cols; j++) {
@@ -128,19 +122,19 @@ export class Draw{
                 if (field != "0") {
                     ctx.beginPath();
                     if(this.#regexPlayer.test(field)){
-                        ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, size / (cellSizeCoefficient/0.9), 0, 2 * Math.PI);
+                        ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, cellSize / (cellSizeCoefficient/0.9), 0, 2 * Math.PI);
                         ctx.fillStyle = this.getPlayerColor(field);
                         ctx.strokeStyle = "black";
                         ctx.fill();
                         ctx.lineWidth = 4;
                     } else if (this.#regexHome.test(field)){
-                        ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, size, 0, 2 * Math.PI);
+                        ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, cellSize, 0, 2 * Math.PI);
                         ctx.fillStyle = this.getPlayerColor(field);
                         ctx.strokeStyle = this.getPlayerColor(field);
                         ctx.lineWidth = 12;
                         // ctx.fill();
                     } else if (this.#regexStart.test(field)){
-                        ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, size, 0, 2 * Math.PI);
+                        ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, cellSize, 0, 2 * Math.PI);
                         ctx.fillStyle = this.getPlayerColor(field);
                         ctx.strokeStyle = this.getPlayerColor(field);
                         ctx.lineWidth = 12;
@@ -149,7 +143,7 @@ export class Draw{
                         // ctx.fill();
                     }
                     else if (field == "X"){
-                        ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, size, 0, 2 * Math.PI);
+                        ctx.arc(i * fieldWidth + fieldWidth / 2, j * fieldHeight + fieldHeight / 2, cellSize, 0, 2 * Math.PI);
                         ctx.strokeStyle = "black";
                         ctx.fillStyle = "lightgrey";
                         ctx.fill();
@@ -159,24 +153,24 @@ export class Draw{
                 }
             }
         }
-        this.drawFigures();
+        this.renderFigures();
     }
 
-    drawFigures(){
+    renderFigures(){
         // console.log(vardump(this.#engine.figure_array));
         let ctx = this.#ctx;
         let figure_array = this.#figure_array;
         for (let i = 0; i < figure_array.length; i++) {
             // for (let j = 0; j < figure_array[i].length; j++) {
                 let fig = figure_array[i];
-                let size = fig.getSize();
+                let cellSize = fig.getSize();
 
                 let player = fig.getPlayer();
                 let x = fig.getX();
                 let y = fig.getY();
 
                 ctx.beginPath();
-                ctx.arc(x, y, size, 0, 2 * Math.PI);
+                ctx.arc(x, y, cellSize, 0, 2 * Math.PI);
                 ctx.fillStyle = this.getPlayerColor(player);
                 ctx.fill();
                 ctx.strokeStyle = "black";
@@ -194,7 +188,7 @@ export class Draw{
 
 
 
-    onMouseDown(event) {
+    figurePickUp(event) {
         const rect = this.#canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
@@ -203,13 +197,13 @@ export class Draw{
         for (let i = 0; i < figure_array.length; i++) {
             
             const fig = figure_array[i];
-            const size = fig.getSize();
+            const cellSize = fig.getSize();
 
             const figX = fig.getX();
             const figY = fig.getY();
 
             // Is mouse over any figure?
-            if (Math.sqrt((x - figX) ** 2 + (y - figY) ** 2) < size) {
+            if (Math.sqrt((x - figX) ** 2 + (y - figY) ** 2) < cellSize) {
                 fig.setOldPosition(figX, figY);
                 this.#draggingFig = fig;
                 this.#offsetX = x - figX;
@@ -219,7 +213,7 @@ export class Draw{
         }
     }
 
-    onMouseMove(event) {
+    figureMove(event) {
         if (this.#draggingFig) {
             const rect = this.#canvas.getBoundingClientRect();
             const x = event.clientX - rect.left - this.#offsetX;
@@ -232,11 +226,11 @@ export class Draw{
 
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
             this.drawGameBoard();
-            this.drawFigures();
+            this.renderFigures();
         }
     }
 
-    onMouseUp(event) {
+    figureDrop(event) {
 
         if (this.#draggingFig) {
             // Get relative mouse coordinates between page and canvas
@@ -244,7 +238,7 @@ export class Draw{
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
 
-            // Calculate cell size of game board grid
+            // Calculate cell cellSize of game board grid
             const fieldWidth = this.#width / this.#cols;
             const fieldHeight = this.#height / this.#rows;
 
@@ -287,7 +281,7 @@ export class Draw{
 
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
             this.drawGameBoard();
-            this.drawFigures();
+            this.renderFigures();
             (validMove) ? this.#dice.rollDice(): null;
         }
         this.#draggingFig = null;
