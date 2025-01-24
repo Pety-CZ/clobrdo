@@ -74,7 +74,7 @@ export class DB {
         const osFig = trans.objectStore(this.#storeFigures);
         const request = osFig.put({
             id: id,
-            playerInd: player,
+            player: player,
             x_coord: x,
             y_coord: y,
             size: size,
@@ -83,35 +83,55 @@ export class DB {
         });
 
         request.onsuccess = () => {
-            console.log("Figure updated in DB: ", id);
+            // console.log("Figure updated in DB: ", id);
         };
         request.onerror = (event) => {
             console.error("Error updating figure: ", event.target.error);
         };
     }
 
-    async getFigs() {
-        const trans = this.#db.transaction(this.#storeFigures, 'readonly');
-        const data = trans.objectStore(this.#storeFigures).index('playerInd').getAll();
+    // async getFigs() {
+    //     const trans = this.#db.transaction(this.#storeFigures, 'readonly');
+    //     const data = trans.objectStore(this.#storeFigures).index('playerInd').getAll();
 
-        const prom = new Promise((res, rej) => {
-            data.onsuccess = res;
-            data.onerror = rej;
+    //     const prom = new Promise((res, rej) => {
+    //         data.onsuccess = res;
+    //         data.onerror = rej;
+    //     });
+    //     await prom;
+    //     return data.result;
+    // }
+
+    // async getFig(id) {
+    //     const trans = this.#db.transaction(this.#storeFigures, 'readonly');
+    //     const data = trans.objectStore(this.#storeFigures).get(id);
+
+    //     const prom = new Promise((res, rej) => {
+    //         data.onsuccess = res;
+    //         data.onerror = rej;
+    //     });
+    //     await prom;
+    //     return data.result;
+    // }
+
+    async getFigs() {
+        return new Promise((resolve, reject) => {
+            const trans = this.#db.transaction(this.#storeFigures, 'readonly');
+            const request = trans.objectStore(this.#storeFigures).getAll(); // Use getAll()
+            request.onsuccess = event => resolve(event.target.result);
+            request.onerror = event => reject(event.target.error);
         });
-        await prom;
-        return data.result;
     }
 
-    async getFig(id) {
-        const trans = this.#db.transaction(this.#storeFigures, 'readonly');
-        const data = trans.objectStore(this.#storeFigures).get(id);
-
-        const prom = new Promise((res, rej) => {
-            data.onsuccess = res;
-            data.onerror = rej;
-        });
-        await prom;
-        return data.result;
+    clearFigures(){
+        const trans = this.#db.transaction(this.#storeFigures, 'readwrite');
+        const data = trans.objectStore(this.#storeFigures).clear();
+        data.onsuccess = () => {
+            console.log('figure DB cleared');
+        };
+        data.onerror = (event) => {
+            console.error('Error clearing figure DB: ', event.target.error);
+        };
     }
 
 }

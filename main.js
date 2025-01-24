@@ -6,19 +6,37 @@ const DEBUG = true;
 const canvas = document.getElementById("gameDesk");
 canvas.style.width = window.innerHeight;
 canvas.style.height = window.innerHeight;
+canvas.style.visibility = "hidden";
 
-
+const newGameBtn = document.getElementById("newGame");
+const loadGameBtn = document.getElementById("loadGame");
 
 const db = new DB();
 await db.connect();
 
+var ge;
 
+newGameBtn.addEventListener('click', () => {
+    console.log("new game");
+    ge = new GameEngine(canvas, DEBUG, db, true);
+    init();
+    // ge.newGame();
+});
 
+loadGameBtn.addEventListener('click', () => {
+    console.log("load game");
+    ge = new GameEngine(canvas, DEBUG, db, false);
+    
+    init();
+    // ge.loadGame();
 
-const ge = new GameEngine(canvas, DEBUG, db);
-// const dice = new Dice(DEBUG);
+});
 
-setListeners();
+function init(){
+    document.getElementById("gameDesk").style.visibility = "visible";
+    document.getElementById("gameStartOptions").style.visibility = "hidden";
+    setListeners();
+}
 
 
 

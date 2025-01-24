@@ -8,6 +8,7 @@ export class GameEngine{
     #board;
     #canvas;
     #db;
+    #resetGame;
     #ctx;
     #fig;
     #dice;
@@ -37,7 +38,8 @@ export class GameEngine{
     #cols;
 
 
-    constructor(canvas, debug, db){
+    constructor(canvas, debug, db, resetGame){
+        this.#resetGame = resetGame;
         this.#DEBUG = debug;
         (debug) ? console.log("GameEngine constructor") : null;
         this.#canvas = canvas;
@@ -52,8 +54,14 @@ export class GameEngine{
 
         this.checkCanvasSize();
         
+  
+
+        (this.#resetGame) ? this.createFigures() : this.loadFigures();
+
+        this.draw();
+    }
+    draw(){
         this.drawGameBoard();
-        this.createFigures();
         this.renderFigures();
     }
     
@@ -70,7 +78,26 @@ export class GameEngine{
         }
     }
 
+    async loadFigures(){
+        try {
+            const figs = await this.#db.getFigs(); // Use await to get the figures
+
+            this.#figure_array = figs.map(figData => {
+                let fig = new Fig(figData.player, figData.x_coord, figData.y_coord, figData.size, figData.color);
+                fig.setId(figData.id);
+                fig.setMoved(figData.hasMoved);
+                return fig;
+            });
+
+            console.log("Figures loaded from DB:", this.#figure_array);
+            this.draw(); // Call render after figures are loaded
+        } catch (error) {
+            console.error("Error loading figures:", error);
+        }
+
+    }
     createFigures(){
+        this.#db.clearFigures();
         let id = 0;
         for (let i = 0; i < this.#rows; i++) {
             for (let j = 0; j < this.#cols; j++) {
@@ -83,12 +110,7 @@ export class GameEngine{
                     let fig = new Fig(player, x, y, size, color);
                     fig.setId(id);
                     fig.setMoved(false);
-                    let dbFig = this.#db.getFig(id);
-                    if (dbFig == fig || dbFig != null){
-                        this.updateFigInDB(fig);
-                    } else{
-                        this.#db.insertFig(id, player, x, y, size, color, fig.getMoved());
-                    }
+                    this.#db.insertFig(id, player, x, y, size, color, fig.getMoved());
                     this.#figure_array.push(fig);
                     id++;
                 }
@@ -213,7 +235,7 @@ export class GameEngine{
             if (validMove){
                 this.updateFigInDB(this.#draggingFig);
             }
-
+            console.log("Moved fig " + this.#draggingFig.getId() + " to " + targetX + "," + targetY);
 
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
             this.drawGameBoard();
@@ -265,15 +287,15 @@ export class GameEngine{
         for(let row = 0; row < this.#rows; row++){
             for(let col = 0; col < this.#cols; col++){
                 let fieldValue = this.#board.getCellValue(row, col);
-                console.log("Field value: " + fieldValue);
+                (this.#DEBUG) ? console.log("Field value: " + fieldValue) : null;
                 if (fieldValue == player){
                     (this.#DEBUG) ? console.log("Found field " + fieldValue) : null;
                     let fieldX = this.#board.getCoordinates(col, this.#width);
                     let fieldY = this.#board.getCoordinates(row, this.#height);
                     let isFieldEmpty = true;
                     for (let i = 0; i < this.#figure_array.length; i++){
-                        let testFig = this.#figure_array[i];
-                        if (testFig.getX() == fieldX && testFig.getY() == fieldY){
+                        let otherFig = this.#figure_array[i];
+                        if (otherFig.getX() == fieldX && otherFig.getY() == fieldY){
                             // field is not empty
                             isFieldEmpty = false;
                             break;
@@ -284,6 +306,7 @@ export class GameEngine{
                         fig.setX(fieldX);
                         fig.setY(fieldY);
                         fig.setMoved(false);
+                        this.updateFigInDB(fig);
                         return;
                     }
                 }
