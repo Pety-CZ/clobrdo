@@ -13,7 +13,7 @@ export class Dice{
 
     rollDice() {    
         this.#currentRoll = Math.floor(Math.random() * this.#SIDES) + 1;
-        this.#dice.src = `sprites/dice/${this.#currentRoll}.png`
+        this.#dice.src = `images/dice_sprites/${this.#currentRoll}.png`
         console.log("Dice roll: " + this.#currentRoll);
     }
 

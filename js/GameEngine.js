@@ -37,14 +37,14 @@ export class GameEngine{
 
 
     constructor(canvas, debug){
-        console.log("GameEngine constructor");
+        this.#DEBUG = debug;
+        (debug) ? console.log("GameEngine constructor") : null;
         this.#canvas = canvas;
         this.#ctx = this.#canvas.getContext("2d");
         
-        this.#DEBUG = debug;
         this.#dice = new Dice();
         
-        this.#board = new Board();
+        this.#board = new Board(debug);
         this.#gameDesk = this.#board.getGameDesk();
 
         this.checkCanvasSize();
@@ -61,21 +61,22 @@ export class GameEngine{
         this.#rows = this.#board.getRows();
         this.#cols = this.#board.getCols();
         this.#figSize = this.#width /2 / this.#cols; // Calculate here
-        console.log("Cell size " + this.#figSize);
-        console.log("Width: " + this.#width + " Height: " + this.#height);
+        if (this.#DEBUG) {
+            console.log("Cell size " + this.#figSize);
+            console.log("Width: " + this.#width + " Height: " + this.#height);
+        }
     }
 
     createFigures(){
         for (let i = 0; i < this.#rows; i++) {
             for (let j = 0; j < this.#cols; j++) {
-                let element = this.#gameDesk[i][j];
-                if (element == "P1" || element == "P2" || element == "P3" || element == "P4"){
-                    let color = element;
+                let player = this.#gameDesk[i][j];
+                if (player == "P1" || player == "P2" || player == "P3" || player == "P4"){
+                    let color = this.getPlayerColor(player);
                     let x = this.#board.getCoordinates(j, this.#width);
                     let y = this.#board.getCoordinates(i, this.#height);
                     let size = this.#figSize * 0.5;
-                    
-                    let fig = new Fig(color, x, y, size, this.#colors);
+                    let fig = new Fig(player, x, y, size, color);
                     this.#figure_array.push(fig);
                 }
             }
@@ -168,12 +169,11 @@ export class GameEngine{
 
             // Snap the figure to the center of the nearest cell
             let dropPosition = this.#gameDesk[closestRow][closestCol];
-            let dropPositionColor = this.getPlayerColor(dropPosition)
-            let figColor = this.getPlayerColor(this.#draggingFig.getPlayer());
+            let dropPositionColor = this.getPlayerColor(dropPosition);
+            let figColor = this.#draggingFig.getPlayer();
 
             let validMove;
- 
-            
+
             if (this.#regexHome.test(dropPosition) || this.#regexPlayer.test(dropPosition)) {   // Check if figure is placed in correct home
                 if (dropPositionColor === figColor) {    // Snap the figure to the center of the correct home cell
                     this.#draggingFig.setX(targetX);
@@ -197,7 +197,6 @@ export class GameEngine{
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
             this.drawGameBoard();
             this.renderFigures();
-            // (validMove) ? this.#dice.rollDice(): null;
         }
         this.#draggingFig = null;
     }
@@ -225,7 +224,9 @@ export class GameEngine{
         for(let row = 0; row < this.#rows; row++){
             for(let col = 0; col < this.#cols; col++){
                 let fieldValue = this.#board.getCellValue(row, col);
+                console.log("Field value: " + fieldValue);
                 if (fieldValue == player){
+                    (this.#DEBUG) ? console.log("Found field " + fieldValue) : null;
                     let fieldX = this.#board.getCoordinates(col, this.#width);
                     let fieldY = this.#board.getCoordinates(row, this.#height);
                     let isFieldEmpty = true;

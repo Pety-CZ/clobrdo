@@ -5,14 +5,14 @@ export class Fig{
     #x_pos;         // current position
     #y_pos;
     #size;          // size in pixels
-    #colorscheme;   // array of colors saved in GameEngine
+    #color;   // array of colors saved in GameEngine
 
-    constructor(player, x, y, size, colors){
+    constructor(player, x, y, size, color){
         this.#player = player;
         this.#x_pos = x;
         this.#y_pos = y;
         this.#size = size;
-        this.#colorscheme = colors;
+        this.#color = color;
     }
 
     getPlayer(){
@@ -45,13 +45,11 @@ export class Fig{
     }
 
     draw(ctx){
-        let player = this.#player
         let x = this.#x_pos;
         let y = this.#y_pos;
         let size = this.#size
-        let color = this.figColor(player);
-
-        // console.log("fig at (" + x + "," + y + ") with color " + color + " and size " + size);
+        let color = this.#color;
+        // (this.#DEBUG) ? console.log("Drawing fig of player " + player + " at (" + x + "," + y + ") with color " + color + " and size " + size) : null;
 
         ctx.beginPath();
         ctx.arc(x, y, size, 0, 2 * Math.PI);
@@ -60,14 +58,5 @@ export class Fig{
         ctx.strokeStyle = "black";
         ctx.lineWidth = size / 2;
         ctx.stroke();
-
-    }
-
-    figColor(player){
-        let number = player.slice(-1);
-        return this.#colorscheme[number - 1];
-    }
-    setColorScheme(colors){
-        this.#colorscheme = colors;
     }
 }

@@ -1,4 +1,5 @@
 export class Board{
+    #DEBUG;
     #gameDesk = [
         ["P1", "P1", "0", "0", "X", "X", "S2", "0", "0", "P2", "P2"],
         ["P1", "P1", "0", "0", "X", "H2", "X", "0", "0", "P2", "P2"],
@@ -22,15 +23,19 @@ export class Board{
     #regexHome = /^H[1-6]$/;
     #regexStart = /^S[1-6]$/;
 
-    constructor(){
-        console.log("Board constructor");
+    constructor(debug){
+        this.#DEBUG = debug;
+        (this.#DEBUG) ? console.log("Board constructor") : null;
         this.#rows = this.#gameDesk.length;
         this.#cols = this.#gameDesk[0].length;
         
-        console.log("Řádků: " + this.#gameDesk.length);
-        console.log("Sloupců: " + this.#gameDesk[0].length);
         this.#maxPlayers = this.getMaxPlayers();
-        console.log("Max hráčů: " + this.#maxPlayers);
+
+        if (this.#DEBUG) {
+            console.log("Řádků: " + this.#gameDesk.length);
+            console.log("Sloupců: " + this.#gameDesk[0].length);
+            console.log("Max hráčů: " + this.#maxPlayers);
+        }
     }
     
     getGameDesk(){
