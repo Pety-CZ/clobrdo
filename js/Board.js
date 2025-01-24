@@ -96,7 +96,6 @@ export class Board{
         for (let i = 0; i < this.#rows; i++) {
             for (let j = 0; j < this.#cols; j++) {
                 let element = this.#gameDesk[i][j];
-                console.log("i: " + i + " j: " + j + " element:" + element);
                 if (this.#regexPlayer.test(element))
                     uniq.add(element);
             }
@@ -109,10 +108,7 @@ export class Board{
     }
 
     getCoordinates(c, length){
-        // let coordinate = c * this.#cellSize;
         let coordinate = c * (length / this.#cols) + (length / this.#cols) / 2;
-        // let y = n * this.#cellSize;
-        // console.log("Returning " + x + "," + y);
         return coordinate;
     }
     getRows(){
@@ -120,6 +116,10 @@ export class Board{
     }
     getCols(){
         return this.#cols;
+    }
+
+    getCellValue(cols, rows){
+        return this.#gameDesk[cols][rows];
     }
 
 }

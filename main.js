@@ -7,9 +7,9 @@ canvas.style.width = window.innerHeight;
 canvas.style.height = window.innerHeight;
 
 
-
-const ge = new GameEngine(canvas);
-const dice = new Dice();
+const DEBUG = true;
+const ge = new GameEngine(canvas, DEBUG);
+// const dice = new Dice(DEBUG);
 
 setListeners();
 
@@ -17,7 +17,7 @@ setListeners();
 
 
 function setListeners(){
-    console.log("setting up listeners...");
+    (DEBUG) ? console.log("setting up listeners...OK!"): null;
 
     // Canvas
     canvas.addEventListener('mousedown', (event) => ge.figurePickUp(event));
@@ -25,5 +25,6 @@ function setListeners(){
     canvas.addEventListener('mouseup', (event) => ge.figureDrop(event));
 
     // Dice
-    document.getElementById("diceSprite").addEventListener('click', () => dice.rollDice());
+    // document.getElementById("diceSprite").addEventListener('click', () => dice.rollDice());
+    
 }

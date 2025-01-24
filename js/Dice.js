@@ -1,17 +1,23 @@
 export class Dice{
-    #SIDES = 6;
+    #DEBUG;
+    #dice;
     #currentRoll;
+    #SIDES;
 
-    constructor(){
+    constructor(debug){
+        this.#DEBUG = debug;
+        this.#SIDES = 6;
+        this.#dice = document.getElementById("diceSprite");
+        document.getElementById("diceSprite").addEventListener('click', () => this.rollDice());
     }
 
-    rollDice(){
+    rollDice() {    
         this.#currentRoll = Math.floor(Math.random() * this.#SIDES) + 1;
+        this.#dice.src = `sprites/dice/${this.#currentRoll}.png`
         console.log("Dice roll: " + this.#currentRoll);
-        return this.#currentRoll;
     }
 
-    getSide(){
+    getRoll(){
         return this.#currentRoll;
     }
 }

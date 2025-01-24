@@ -4,6 +4,7 @@ import { Board } from './Board.js';
 
 
 export class GameEngine{
+    #DEBUG;
     #board;
     #canvas;
     #ctx;
@@ -35,11 +36,12 @@ export class GameEngine{
     #cols;
 
 
-    constructor(canvas){
+    constructor(canvas, debug){
         console.log("GameEngine constructor");
         this.#canvas = canvas;
         this.#ctx = this.#canvas.getContext("2d");
         
+        this.#DEBUG = debug;
         this.#dice = new Dice();
         
         this.#board = new Board();
@@ -47,20 +49,6 @@ export class GameEngine{
 
         this.checkCanvasSize();
         
-        
-        // old ENGINE
-        
-        // this.#rows = this.#gameDesk.length;
-        // this.#cols = this.#gameDesk[0].length;
-        // this.#maxPlayers = this.getMaxPlayers();
-        // this.#figSize = this.#width / 2 / this.#cols;
-        
-        
-        // console.log("Řádků: " + this.#gameDesk.length);
-        // console.log("Sloupců: " + this.#gameDesk[0].length);
-        // console.log("Max hráčů: " + this.#maxPlayers);
-        
-        // this.#figure_array.push(["P1", 5, 5]);
         this.drawGameBoard();
         this.createFigures();
         this.renderFigures();
@@ -199,6 +187,7 @@ export class GameEngine{
             } else if (dropPosition !== "0") {          // Check if figure is placed in correct start
                 this.#draggingFig.setX(targetX);
                 this.#draggingFig.setY(targetY);
+                this.checkFieldForFigure();
                 validMove = true;
             } else {
                 this.#draggingFig.resetOldPosition();
@@ -208,8 +197,55 @@ export class GameEngine{
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
             this.drawGameBoard();
             this.renderFigures();
-            (validMove) ? this.#dice.rollDice(): null;
+            // (validMove) ? this.#dice.rollDice(): null;
         }
         this.#draggingFig = null;
+    }
+
+
+    // If figure is dropped on another figure
+    // if so, kick old figure and move it to player
+    checkFieldForFigure(){
+        for(let i = 0; i < this.#figure_array.length; i++){
+            let kickFig = this.#figure_array[i];
+            let newFig = this.#draggingFig;
+
+            if (kickFig.getX() == newFig.getX() && kickFig.getY() == newFig.getY() && kickFig != newFig){
+                (this.#DEBUG) ? console.log("Kicking figure: " + kickFig.getPlayer() +", " + kickFig.getX() + " " + kickFig.getY() + " ...") : null;
+                this.kickFigure(kickFig);
+            }
+        }
+    }
+    kickFigure(fig){
+        // Look for empty Pn field
+        // =====> get Pn(X,Y) from board, compare fig_array if there is any figure on this position
+        // =====> if yes, move it there
+        let player = fig.getPlayer();
+        (this.#DEBUG) ? console.log("Looking for empty home field of player " + player) : null;
+        for(let row = 0; row < this.#rows; row++){
+            for(let col = 0; col < this.#cols; col++){
+                let fieldValue = this.#board.getCellValue(row, col);
+                if (fieldValue == player){
+                    let fieldX = this.#board.getCoordinates(col, this.#width);
+                    let fieldY = this.#board.getCoordinates(row, this.#height);
+                    let isFieldEmpty = true;
+                    for (let i = 0; i < this.#figure_array.length; i++){
+                        let testFig = this.#figure_array[i];
+                        if (testFig.getX() == fieldX && testFig.getY() == fieldY){
+                            // field is not empty
+                            isFieldEmpty = false;
+                            break;
+                        }
+                    }
+                    if (isFieldEmpty){
+                        (this.#DEBUG) ? console.log("Field " + fieldValue + " IS EMPTY, MOVING FIG!") : null;
+                        fig.setX(fieldX);
+                        fig.setY(fieldY);
+                        return;
+                    }
+                }
+            }
+        }
+        
     }
 }

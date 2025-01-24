@@ -1,11 +1,11 @@
 export class Fig{
-    #player;
-    #oldX;
+    #player;        // P1, P2...
+    #oldX;          // position for returning fig from invalid placed position
     #oldY;
-    #x_pos;
+    #x_pos;         // current position
     #y_pos;
-    #size;
-    #colorscheme;
+    #size;          // size in pixels
+    #colorscheme;   // array of colors saved in GameEngine
 
     constructor(player, x, y, size, colors){
         this.#player = player;
