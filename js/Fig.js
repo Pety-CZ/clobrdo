@@ -6,6 +6,7 @@ export class Fig{
     #y_pos;
     #size;          // size in pixels
     #color;   // array of colors saved in GameEngine
+    #moved = false;
 
     constructor(player, x, y, size, color){
         this.#player = player;
@@ -27,12 +28,21 @@ export class Fig{
     getSize(){
         return this.#size;
     }
+    getColor(){
+        return this.#color;
+    }
 
     setX(x){
         this.#x_pos = x;
     }
     setY(y){
         this.#y_pos = y;
+    }
+    setMoved(value){
+        this.#moved = value;
+    }
+    getMoved(){
+        return this.#moved;
     }
 
     resetOldPosition(){

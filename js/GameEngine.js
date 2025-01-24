@@ -72,11 +72,12 @@ export class GameEngine{
             for (let j = 0; j < this.#cols; j++) {
                 let player = this.#gameDesk[i][j];
                 if (player == "P1" || player == "P2" || player == "P3" || player == "P4"){
-                    let color = this.getPlayerColor(player);
+                    let color = this.getFieldColor(player);
                     let x = this.#board.getCoordinates(j, this.#width);
                     let y = this.#board.getCoordinates(i, this.#height);
                     let size = this.#figSize * 0.5;
                     let fig = new Fig(player, x, y, size, color);
+                    fig.setMoved(false);
                     this.#figure_array.push(fig);
                 }
             }
@@ -140,8 +141,8 @@ export class GameEngine{
     }
 
 
-    getPlayerColor(player) {
-        let number = player.slice(-1);
+    getFieldColor(field) {
+        let number = field.slice(-1);
         return this.#colors[number - 1];
     }
 
@@ -169,13 +170,15 @@ export class GameEngine{
 
             // Snap the figure to the center of the nearest cell
             let dropPosition = this.#gameDesk[closestRow][closestCol];
-            let dropPositionColor = this.getPlayerColor(dropPosition);
-            let figColor = this.#draggingFig.getPlayer();
+            let dropPositionColor = this.getFieldColor(dropPosition);
+            let figColor = this.#draggingFig.getColor();
 
             let validMove;
 
-            if (this.#regexHome.test(dropPosition) || this.#regexPlayer.test(dropPosition)) {   // Check if figure is placed in correct home
-                if (dropPositionColor === figColor) {    // Snap the figure to the center of the correct home cell
+            if (this.#draggingFig.getMoved() == false){
+                this.moveFigToStart(this.#draggingFig);
+            } else if (this.#regexHome.test(dropPosition)){     // Check if figure is placed in correct home
+                if (dropPositionColor === figColor) {           // Snap the figure to the center of the correct home cell
                     this.#draggingFig.setX(targetX);
                     this.#draggingFig.setY(targetY);
                     console.log("Home field");
@@ -199,6 +202,22 @@ export class GameEngine{
             this.renderFigures();
         }
         this.#draggingFig = null;
+    }
+
+    moveFigToStart(fig){
+        for (let x = 0; x < this.#rows; x++) {
+            for (let y = 0; y < this.#cols; y++) {
+                let field = this.#gameDesk[y][x];
+                let startField =  this.#regexStart.test(field)
+                if (startField && this.getFieldColor(field) == fig.getColor()){
+                    fig.setMoved(true);
+                    fig.setX(this.#board.getCoordinates(x, this.#width));
+                    fig.setY(this.#board.getCoordinates(y, this.#height));
+                    this.checkFieldForFigure();
+                    return;
+                }
+            }
+        }
     }
 
 
@@ -242,6 +261,7 @@ export class GameEngine{
                         (this.#DEBUG) ? console.log("Field " + fieldValue + " IS EMPTY, MOVING FIG!") : null;
                         fig.setX(fieldX);
                         fig.setY(fieldY);
+                        fig.setMoved(false);
                         return;
                     }
                 }
