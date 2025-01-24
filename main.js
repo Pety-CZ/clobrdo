@@ -1,14 +1,21 @@
 import { GameEngine } from './js/GameEngine.js';
-import { Dice } from './js/Dice.js';
+import { DB } from './js/DB.js';
+
+const DEBUG = true;
 
 const canvas = document.getElementById("gameDesk");
-// canvas.style.height = document.height;
 canvas.style.width = window.innerHeight;
 canvas.style.height = window.innerHeight;
 
 
-const DEBUG = true;
-const ge = new GameEngine(canvas, DEBUG);
+
+const db = new DB();
+await db.connect();
+
+
+
+
+const ge = new GameEngine(canvas, DEBUG, db);
 // const dice = new Dice(DEBUG);
 
 setListeners();

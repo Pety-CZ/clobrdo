@@ -7,6 +7,7 @@ export class GameEngine{
     #DEBUG;
     #board;
     #canvas;
+    #db;
     #ctx;
     #fig;
     #dice;
@@ -36,7 +37,7 @@ export class GameEngine{
     #cols;
 
 
-    constructor(canvas, debug){
+    constructor(canvas, debug, db){
         this.#DEBUG = debug;
         (debug) ? console.log("GameEngine constructor") : null;
         this.#canvas = canvas;
@@ -44,6 +45,8 @@ export class GameEngine{
         
         this.#dice = new Dice();
         
+        this.#db = db;
+
         this.#board = new Board(debug);
         this.#gameDesk = this.#board.getGameDesk();
 
@@ -68,6 +71,7 @@ export class GameEngine{
     }
 
     createFigures(){
+        let id = 0;
         for (let i = 0; i < this.#rows; i++) {
             for (let j = 0; j < this.#cols; j++) {
                 let player = this.#gameDesk[i][j];
@@ -77,8 +81,16 @@ export class GameEngine{
                     let y = this.#board.getCoordinates(i, this.#height);
                     let size = this.#figSize * 0.5;
                     let fig = new Fig(player, x, y, size, color);
+                    fig.setId(id);
                     fig.setMoved(false);
+                    let dbFig = this.#db.getFig(id);
+                    if (dbFig == fig || dbFig != null){
+                        this.updateFigInDB(fig);
+                    } else{
+                        this.#db.insertFig(id, player, x, y, size, color, fig.getMoved());
+                    }
                     this.#figure_array.push(fig);
+                    id++;
                 }
             }
         }
@@ -177,6 +189,7 @@ export class GameEngine{
 
             if (this.#draggingFig.getMoved() == false){
                 this.moveFigToStart(this.#draggingFig);
+                validMove = true;
             } else if (this.#regexHome.test(dropPosition)){     // Check if figure is placed in correct home
                 if (dropPositionColor === figColor) {           // Snap the figure to the center of the correct home cell
                     this.#draggingFig.setX(targetX);
@@ -197,6 +210,11 @@ export class GameEngine{
                 validMove = false;
             }
 
+            if (validMove){
+                this.updateFigInDB(this.#draggingFig);
+            }
+
+
             this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
             this.drawGameBoard();
             this.renderFigures();
@@ -204,6 +222,10 @@ export class GameEngine{
         this.#draggingFig = null;
     }
 
+    updateFigInDB(fig){
+        this.#db.updateFig(fig.getId(), fig.getPlayer(), fig.getX(), fig.getY(), fig.getSize(), fig.getColor(), fig.getMoved());
+    }
+    
     moveFigToStart(fig){
         for (let x = 0; x < this.#rows; x++) {
             for (let y = 0; y < this.#cols; y++) {

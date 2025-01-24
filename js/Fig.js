@@ -1,4 +1,5 @@
 export class Fig{
+    #id;
     #player;        // P1, P2...
     #oldX;          // position for returning fig from invalid placed position
     #oldY;
@@ -16,6 +17,12 @@ export class Fig{
         this.#color = color;
     }
 
+    getId(){
+        return this.#id;
+    }
+    setId(id){
+        this.#id = id;
+    }
     getPlayer(){
         return this.#player;
     }
