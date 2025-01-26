@@ -10,6 +10,7 @@ export class GameEngine{
     #db;
     #resetGame;
     #players;
+    #player = 0;
 
     #ctx;
     #dice;
@@ -54,6 +55,7 @@ export class GameEngine{
 
         this.checkCanvasSize();
         (this.#resetGame) ? this.createFigures(this.#players) : this.loadFigures();
+        this.#dice.setColor(this.#colors[this.#players[0]]);
 
         this.draw();
     }
@@ -95,6 +97,7 @@ export class GameEngine{
 
     }
     createFigures(players){
+        this.#players = players;
         this.#db.clearFigures();
         let id = 0;
         for (let i = 0; i < this.#rows; i++) {
@@ -233,6 +236,13 @@ export class GameEngine{
             if (validMove){
                 this.updateFigInDB(this.#draggingFig);
                 (this.#DEBUG) ? console.log("Moved fig " + this.#draggingFig.getId() + " to " + targetX + "," + targetY) :null;
+                if (this.#dice.getRoll() != 6){
+                    this.#player = (this.#player + 1) % this.#players.length;
+                    console.log("Player " + this.#player + " turn");
+                    let color = this.#players[this.#player];
+                    color = this.#colors[color.slice(-1) - 1];
+                    this.#dice.setColor(color);
+                } 
             } else{
                 this.#draggingFig.resetOldPosition();
             }
