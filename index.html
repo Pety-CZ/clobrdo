@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,22 +22,62 @@
             <button id="loadGame">Pokračovat ve hře</button>
             <button id="newGame">Spustit novou hru</button>
         </div>
+        <div id="playerSelect">
+            <form>
+                <input type="checkbox" id="p1" name="p1" value="p1">
+                <label for="vehicle1"> Modrá </label><br>
+                <input type="checkbox" id="p2" name="p2" value="p2">
+                <label for="vehicle2"> Červená </label><br>
+                <input type="checkbox" id="p3" name="p3" value="p3">
+                <label for="vehicle3"> Žlutá </label><br>
+                <input type="checkbox" id="p4" name="p4" value="p4">
+                <label for="vehicle4"> Zelená </label><br>
+            </form>
+            <!-- <button id="startNewGame" onclick="startGameWithPlayers()">START!</button>-->
+            <button id="startNewGame">START!</button>
+
+        </div>
         <div id="canvas" class="center">
             <!-- <canvas id="gameDesk" style="border:1px solid #000000;"> -->
             <!-- <canvas id="gameDesk" width="1100" height="1100" style="border:1px solid #000000;"> -->
-            <canvas id="gameDesk" width="850" height="850" style="border:1px solid #000000;">
-            <!-- <canvas id="gameDesk" width="600" height="600" style="border:1px solid #000000;"> -->
+            <!-- <canvas id="gameDesk" width="850" height="850" style="border:1px solid #000000;"> -->
+            <canvas id="gameDesk" width="500" height="500" style="border:1px solid #000000;">
                 Tento prohlížeč nepodporuje HTML5 pláno! /
                 Your browser does not support HTML5 canvas.
             </canvas>
         </div>
         <div id="dice" class="center">
-            <img id="diceSprite" src="images/dice_sprites/5.png" alt="" class="center">
+            <img id="diceSprite" src="/images/dice_sprites/1.png" alt="" class="center">
         </div>
     </div>
-    <!-- <button>Hod kostkou</button> -->
+    <script>
+        let dice = document.getElementById('diceSprite');
+        let number = Math.floor(Math.random() * 6) + 1;
+        dice.src = '/images/dice_sprites/' + number + '.png';
+    </script>
+    <!-- <script src="main.js" type="module"> --> 
+    <script type="module">
+        import { Main } from './main.js';
+        function startGameWithPlayers(){
+            const player1Checked = document.getElementById("p1").checked;
+            const player2Checked = document.getElementById("p2").checked;
+            const player3Checked = document.getElementById("p3").checked;
+            const player4Checked = document.getElementById("p4").checked;
 
+            const selectedPlayers = [];
+            if (player1Checked) selectedPlayers.push("P1"); // Or a more meaningful value like "blue", selectedPlayers);
+            if (player2Checked) selectedPlayers.push("P2"); // "red"
+            if (player3Checked) selectedPlayers.push("P3"); // "yellow"
+            if (player4Checked) selectedPlayers.push("P4"); // "green"
 
-    <script src="main.js" type="module"></script>
+            console.log("Selected players:", selectedPlayers);  // Check the console
+            const main = new Main();
+            main.setPlayers(selectedPlayers);
+            // main.setPlayers(selectedPlayers);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('startNewGame').addEventListener('click', startGameWithPlayers); // Pass the function, don't call it
+            });
+    </script>
 </body>
 </html>

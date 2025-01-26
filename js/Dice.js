@@ -7,6 +7,7 @@ export class Dice{
     constructor(debug){
         this.#DEBUG = debug;
         this.#SIDES = 6;
+        document.getElementById("dice").style.visibility = "visible";
         this.#dice = document.getElementById("diceSprite");
         document.getElementById("diceSprite").addEventListener('click', () => this.rollDice());
     }

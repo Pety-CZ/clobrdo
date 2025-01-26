@@ -6,9 +6,7 @@ export class DB {
     #storeFigures = "figuresOnBoard";
     #dbRequest;
 
-    constructor() {
-
-    }
+    constructor() {}
 
     connect() {
         return new Promise((res, rej) => {
@@ -42,6 +40,14 @@ export class DB {
             osFig.createIndex('colorInd', 'color');
             osFig.createIndex('movedInd', 'hasMoved');
         }
+        if(!this.#db.objectStoreNames.contains(this.#storeBoard)){
+            const osBoard = this.#db.createObjectStore(this.#storeBoard,
+                { keyPath: "id", autoIncrement: true });
+            osBoard.createIndex('xInd', 'x_coord');
+            osBoard.createIndex('yInd', 'y_coord');
+            osBoard.createIndex('valueInd', 'value');
+        }
+        
     }
 
     onsuccess(ev) {
@@ -90,30 +96,6 @@ export class DB {
         };
     }
 
-    // async getFigs() {
-    //     const trans = this.#db.transaction(this.#storeFigures, 'readonly');
-    //     const data = trans.objectStore(this.#storeFigures).index('playerInd').getAll();
-
-    //     const prom = new Promise((res, rej) => {
-    //         data.onsuccess = res;
-    //         data.onerror = rej;
-    //     });
-    //     await prom;
-    //     return data.result;
-    // }
-
-    // async getFig(id) {
-    //     const trans = this.#db.transaction(this.#storeFigures, 'readonly');
-    //     const data = trans.objectStore(this.#storeFigures).get(id);
-
-    //     const prom = new Promise((res, rej) => {
-    //         data.onsuccess = res;
-    //         data.onerror = rej;
-    //     });
-    //     await prom;
-    //     return data.result;
-    // }
-
     async getFigs() {
         return new Promise((resolve, reject) => {
             const trans = this.#db.transaction(this.#storeFigures, 'readonly');
@@ -134,4 +116,62 @@ export class DB {
         };
     }
 
+
+    saveBoard(boardData) { // New function to save the board layout
+        return new Promise((resolve, reject) => {
+            const trans = this.#db.transaction(this.#storeBoard, 'readwrite');
+            const osBoard = trans.objectStore(this.#storeBoard);
+
+            trans.oncomplete = () => resolve();
+            trans.onerror = (e) => reject(e.target.error);
+
+
+            // This loop adds or updates the cells, using put()
+            for (let i = 0; i < boardData.length; i++) {
+                for (let j = 0; j < boardData[0].length; j++) {
+                    osBoard.put({ id: `${i}-${j}`, x_coord: i, y_coord: j, value: boardData[i][j] });
+                }
+            }
+
+        });
+    }
+
+    insertBoard(x, y, value) {
+        /// 1. vytvoreni transakce
+        const trans = this.#db.transaction(this.#storeBoard, "readwrite");
+        trans.oncomplete = () => {
+            console.log('Transakce dokončena.');
+        };
+        trans.onerror = (e) => {
+            console.error('Chyba při transakci:', e.target.errorCode);
+        };
+
+        const osBoard = trans.objectStore(this.#storeBoard);
+        const request = osBoard.add({ x_coord: x, y_coord: y, value:value});
+
+        request.onsuccess = (event) => {
+            console.log('Záznam úspěšně přidán:', { x_coord: x, y_coord: y, value: value });
+            return event.target.result;
+        }
+    }
+ 
+    async getBoard() {
+        return new Promise((resolve, reject) => {
+            const trans = this.#db.transaction(this.#storeBoard, 'readonly');
+            const request = trans.objectStore(this.#storeBoard).getAll();
+            request.onsuccess = event => resolve(event.target.result);
+            request.onerror = event => reject(event.target.error);
+        });
+    }
+
+    clearBoard() {
+        const trans = this.#db.transaction(this.#storeBoard, 'readwrite');
+        const data = trans.objectStore(this.#storeBoard).clear();
+        data.onsuccess = () => {
+            console.log('board DB cleared');
+        };
+        data.onerror = (event) => {
+            console.error('Error clearing board DB: ', event.target.error);
+        };
+    }
 }

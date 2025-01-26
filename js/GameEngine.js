@@ -9,8 +9,9 @@ export class GameEngine{
     #canvas;
     #db;
     #resetGame;
+    #players;
+
     #ctx;
-    #fig;
     #dice;
     #width;
     #height;
@@ -29,16 +30,13 @@ export class GameEngine{
     #colors = ["blue", "red", "yellow", "green", "purple", "black"];
 
     #figure_array = [];
- 
-    #maxPlayers;
     #gameDesk;
-    
 
     #rows;
     #cols;
 
 
-    constructor(canvas, debug, db, resetGame){
+    constructor(canvas, debug, db, resetGame, players){
         this.#resetGame = resetGame;
         this.#DEBUG = debug;
         (debug) ? console.log("GameEngine constructor") : null;
@@ -49,18 +47,18 @@ export class GameEngine{
         
         this.#db = db;
 
-        this.#board = new Board(debug);
+        this.#players = players;
+    
+        this.#board = new Board(debug, db, resetGame);
         this.#gameDesk = this.#board.getGameDesk();
 
         this.checkCanvasSize();
-        
-  
-
-        (this.#resetGame) ? this.createFigures() : this.loadFigures();
+        (this.#resetGame) ? this.createFigures(this.#players) : this.loadFigures();
 
         this.draw();
     }
     draw(){
+        this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
         this.drawGameBoard();
         this.renderFigures();
     }
@@ -96,24 +94,27 @@ export class GameEngine{
         }
 
     }
-    createFigures(){
+    createFigures(players){
         this.#db.clearFigures();
         let id = 0;
         for (let i = 0; i < this.#rows; i++) {
             for (let j = 0; j < this.#cols; j++) {
-                let player = this.#gameDesk[i][j];
-                if (player == "P1" || player == "P2" || player == "P3" || player == "P4"){
-                    let color = this.getFieldColor(player);
-                    let x = this.#board.getCoordinates(j, this.#width);
-                    let y = this.#board.getCoordinates(i, this.#height);
-                    let size = this.#figSize * 0.5;
-                    let fig = new Fig(player, x, y, size, color);
-                    fig.setId(id);
-                    fig.setMoved(false);
-                    this.#db.insertFig(id, player, x, y, size, color, fig.getMoved());
-                    this.#figure_array.push(fig);
-                    id++;
-                }
+                let field = this.#gameDesk[i][j];
+                players.forEach(player => {
+                    if (player == field){
+                        console.log("Creating figure for player: " + player);
+                        let color = this.getFieldColor(player);
+                        let x = this.#board.getCoordinates(j, this.#width);
+                        let y = this.#board.getCoordinates(i, this.#height);
+                        let size = this.#figSize * 0.5;
+                        let fig = new Fig(player, x, y, size, color);
+                        fig.setId(id);
+                        fig.setMoved(false);
+                        this.#db.insertFig(id, player, x, y, size, color, fig.getMoved());
+                        this.#figure_array.push(fig);
+                        id++;
+                    }
+                });
             }
         }
     }
@@ -181,7 +182,6 @@ export class GameEngine{
     }
 
     figureDrop(event) {
-
         if (this.#draggingFig) {
             // Get relative mouse coordinates between page and canvas
             const rect = this.#canvas.getBoundingClientRect();
@@ -207,7 +207,7 @@ export class GameEngine{
             let dropPositionColor = this.getFieldColor(dropPosition);
             let figColor = this.#draggingFig.getColor();
 
-            let validMove;
+            let validMove = false;
 
             if (this.#draggingFig.getMoved() == false){
                 this.moveFigToStart(this.#draggingFig);
@@ -219,27 +219,25 @@ export class GameEngine{
                     console.log("Home field");
                     validMove = true;
                 } else{
-                    this.#draggingFig.resetOldPosition();
                     validMove = false;
                 }
-            } else if (dropPosition !== "0") {          // Check if figure is placed in correct start
+            } else if (dropPosition !== "0") {          // Check if figure is placed in correct field (X, Sn, Hn)
                 this.#draggingFig.setX(targetX);
                 this.#draggingFig.setY(targetY);
                 this.checkFieldForFigure();
                 validMove = true;
             } else {
-                this.#draggingFig.resetOldPosition();
                 validMove = false;
             }
-
+            
             if (validMove){
                 this.updateFigInDB(this.#draggingFig);
+                (this.#DEBUG) ? console.log("Moved fig " + this.#draggingFig.getId() + " to " + targetX + "," + targetY) :null;
+            } else{
+                this.#draggingFig.resetOldPosition();
             }
-            console.log("Moved fig " + this.#draggingFig.getId() + " to " + targetX + "," + targetY);
 
-            this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
-            this.drawGameBoard();
-            this.renderFigures();
+            this.draw();
         }
         this.#draggingFig = null;
     }
@@ -264,7 +262,6 @@ export class GameEngine{
         }
     }
 
-
     // If figure is dropped on another figure
     // if so, kick old figure and move it to player
     checkFieldForFigure(){
@@ -287,7 +284,7 @@ export class GameEngine{
         for(let row = 0; row < this.#rows; row++){
             for(let col = 0; col < this.#cols; col++){
                 let fieldValue = this.#board.getCellValue(row, col);
-                (this.#DEBUG) ? console.log("Field value: " + fieldValue) : null;
+                // (this.#DEBUG) ? console.log("Field value: " + fieldValue) : null;
                 if (fieldValue == player){
                     (this.#DEBUG) ? console.log("Found field " + fieldValue) : null;
                     let fieldX = this.#board.getCoordinates(col, this.#width);
