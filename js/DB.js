@@ -117,7 +117,7 @@ export class DB {
     }
 
 
-    saveBoard(boardData) { // New function to save the board layout
+    saveBoard(boardData) {
         return new Promise((resolve, reject) => {
             const trans = this.#db.transaction(this.#storeBoard, 'readwrite');
             const osBoard = trans.objectStore(this.#storeBoard);
@@ -125,8 +125,6 @@ export class DB {
             trans.oncomplete = () => resolve();
             trans.onerror = (e) => reject(e.target.error);
 
-
-            // This loop adds or updates the cells, using put()
             for (let i = 0; i < boardData.length; i++) {
                 for (let j = 0; j < boardData[0].length; j++) {
                     osBoard.put({ id: `${i}-${j}`, x_coord: i, y_coord: j, value: boardData[i][j] });

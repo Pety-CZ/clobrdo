@@ -13,32 +13,26 @@ export class Dice{
     }
 
     rollDice() {
-        const animationDuration = 1000; // 1 second total animation time
-        const fadeDuration = 200;      // 200ms for each fade (in/out)
-
+        const animationDuration = 1000;
+        const fadeDuration = 200;
         // 1. Fade Out
-        this.#dice.style.opacity = 0;  // Set opacity to 0 to start fade out
-
-        // 2. Wait for fade out to complete, then change image and fade in
+        this.#dice.style.opacity = 0;
+        // 2. Wait for fade out, then fade in
         setTimeout(() => {
             //Change image source during fade out.
             this.#currentRoll = Math.floor(Math.random() * this.#SIDES) + 1;
             this.#dice.src = `images/dice_sprites/${this.#currentRoll}.png`;
 
-            this.#dice.style.opacity = 1; // Fade in
+            // Fade in
+            this.#dice.style.opacity = 1; 
             setTimeout(() => {
                 console.log("Dice roll:", this.#currentRoll);
 
             }, fadeDuration);
-
-
-
         }, fadeDuration);
-
-
-
     }
 
+    // OLD METHOD
     // rollDice() {    
     //     this.#currentRoll = Math.floor(Math.random() * this.#SIDES) + 1;
     //     this.#dice.src = `images/dice_sprites/${this.#currentRoll}.png`

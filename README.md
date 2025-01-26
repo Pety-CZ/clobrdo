@@ -21,8 +21,6 @@ Pokud hráč umístí figurku na políčko, na kterém už nějaká figurka stoj
 ### Usecase diagram:
 
 ![usecasediagram](UseCaseDiagram.svg)
-----
-
 
 
 # Technická Specifikace
@@ -36,7 +34,9 @@ Fig | Figurka, komu patří, její souřadnice (x,y), barva...
 Dice | Kostka
 DB | Čtení a zápis do databáze
 
+### Class diagram
+![classdiagram](ClassDiagram.svg)
 
+https://github.com/Pety-CZ/clobrdo
 
-## Funkční Specifikace
-
+https://clobrdo.petrn.site/

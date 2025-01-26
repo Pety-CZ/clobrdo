@@ -55,7 +55,7 @@ export class GameEngine{
 
         this.checkCanvasSize();
         (this.#resetGame) ? this.createFigures(this.#players) : this.loadFigures();
-        this.#dice.setColor(this.#colors[this.#players[0]]);
+        // this.#dice.setColor(this.#colors[this.#players[0]]);
 
         this.draw();
     }
@@ -65,13 +65,14 @@ export class GameEngine{
         this.renderFigures();
     }
     
+    // Get canvas size ==> where and how big to draw the figures
     checkCanvasSize(){
         let canvasSize = Math.min(this.#canvas.offsetWidth, this.#canvas.offsetHeight);
         this.#width = canvasSize;
         this.#height = canvasSize;
         this.#rows = this.#board.getRows();
         this.#cols = this.#board.getCols();
-        this.#figSize = this.#width /2 / this.#cols; // Calculate here
+        this.#figSize = this.#width /2 / this.#cols;
         if (this.#DEBUG) {
             console.log("Cell size " + this.#figSize);
             console.log("Width: " + this.#width + " Height: " + this.#height);
@@ -80,7 +81,7 @@ export class GameEngine{
 
     async loadFigures(){
         try {
-            const figs = await this.#db.getFigs(); // Use await to get the figures
+            const figs = await this.#db.getFigs(); 
 
             this.#figure_array = figs.map(figData => {
                 let fig = new Fig(figData.player, figData.x_coord, figData.y_coord, figData.size, figData.color);
@@ -90,12 +91,27 @@ export class GameEngine{
             });
 
             console.log("Figures loaded from DB:", this.#figure_array);
-            this.draw(); // Call render after figures are loaded
+            this.#players = await this.getUniquePlayersFromFigures();
+            this.draw();
         } catch (error) {
             console.error("Error loading figures:", error);
         }
-
     }
+
+    // In case of resuming game. load players from figures DB to color the dice
+    async getUniquePlayersFromFigures() {
+        try {
+            const figures = await this.#db.getFigs();
+            const uniquePlayers = new Set(figures.map(figure => figure.player));
+            return Array.from(uniquePlayers);
+
+        } catch (error) {
+            console.error("Error getting unique players:", error);
+            return [];
+        }
+    }
+
+    // When new game, create figures for each player
     createFigures(players){
         this.#players = players;
         this.#db.clearFigures();
@@ -224,7 +240,8 @@ export class GameEngine{
                 } else{
                     validMove = false;
                 }
-            } else if (dropPosition !== "0") {          // Check if figure is placed in correct field (X, Sn, Hn)
+            // Check if figure is placed in correct field (X, Sn, Hn)
+            } else if (dropPosition !== "0") {          
                 this.#draggingFig.setX(targetX);
                 this.#draggingFig.setY(targetY);
                 this.checkFieldForFigure();
@@ -308,6 +325,7 @@ export class GameEngine{
                             break;
                         }
                     }
+
                     if (isFieldEmpty){
                         (this.#DEBUG) ? console.log("Field " + fieldValue + " IS EMPTY, MOVING FIG!") : null;
                         fig.setX(fieldX);
@@ -319,6 +337,5 @@ export class GameEngine{
                 }
             }
         }
-        
     }
 }

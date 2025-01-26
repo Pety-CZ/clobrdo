@@ -33,22 +33,7 @@ export class Board{
         this.#gameDesk = this.#defaultGameDesk;
         this.#rows = this.#gameDesk.length;
         this.#cols = this.#gameDesk[0].length;
-        // this.loadGameDesk().then(() => {
-        //     if (!resetGame) {
-        //         this.#rows = this.#gameDesk.length;
-        //         this.#cols = this.#gameDesk[0].length;
-
-        //     }
-        //     this.#maxPlayers = this.getMaxPlayers(); // Call after loadGameDesk completes
-        // }).catch(error => {
-        //     console.error("Error loading game desk:", error);
-        //     this.#gameDesk = this.#defaultGameDesk;
-        //     this.#rows = this.#gameDesk.length;
-        //     this.#cols = this.#gameDesk[0].length;
-
-        // });
-
-        
+  
         this.#maxPlayers = this.getMaxPlayers();
 
         if (this.#DEBUG) {
@@ -70,7 +55,7 @@ export class Board{
                 this.#gameDesk = board;
             } else {
                 console.log("No board data found. Saving default board...");
-                await this.#db.saveBoard(this.#defaultGameDesk); // Save the default board if none exists
+                await this.#db.saveBoard(this.#defaultGameDesk); // Save the default board
             }
         } catch (error) {
             console.error("Error loading game desk:", error);
@@ -82,20 +67,15 @@ export class Board{
     }
     
     draw(ctx, width, height){
-        // console.log("render board");
         this.#cellSize = width/ 2 / this.#cols;
         let fieldWidth = width / this.#cols;
         let fieldHeight = height / this.#rows;
         let cellSizeCoefficient = 0.8;
         let cellSize = this.#cellSize * cellSizeCoefficient;
-        // console.log("Canvas cellSize: " + this.#width + "x" + this.#height);
-        // console.log("Cell cellSize: " + fieldWidth + "x" + fieldHeight);
-        // console.log("Field cellSize: " + this.#cellSize);
 
         for (let i = 0; i < this.#rows; i++) {
             for (let j = 0; j < this.#cols; j++) {
                 let field = this.#gameDesk[j][i];
-                // console.log(field);
                 if (field != "0") {
                     ctx.beginPath();
                     if (this.#regexPlayer.test(field)) {
@@ -146,6 +126,7 @@ export class Board{
         }
         return uniq.size;
     }
+
     getPlayerColor(player) {
         let number = player.slice(-1);
         return this.#colorScheme[number - 1];
@@ -155,9 +136,11 @@ export class Board{
         let coordinate = c * (length / this.#cols) + (length / this.#cols) / 2;
         return coordinate;
     }
+
     getRows(){
         return this.#rows;
     }
+
     getCols(){
         return this.#cols;
     }
@@ -165,5 +148,4 @@ export class Board{
     getCellValue(cols, rows){
         return this.#gameDesk[cols][rows];
     }
-
 }

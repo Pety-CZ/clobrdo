@@ -5,17 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/images/favicon.png">
     <link rel="stylesheet" href="style.css">
-    
     <title>Člobrdo</title>
 </head>
 <body>
-    <!-- <h1>Člověče, nezlob se!</h1> -->
-    <!-- <div>
-        <input type="file" name="inputfile" id="inputfile">
-        <br>
-        
-        <pre id="output"></pre>
-    </div> -->
     <div id="text"></div>
     <div id="container">
         <div id="gameStartOptions">
@@ -33,13 +25,11 @@
                 <input type="checkbox" id="p4" name="p4" value="p4">
                 <label for="vehicle4"> Zelená </label><br>
             </form>
-            <!-- <button id="startNewGame" onclick="startGameWithPlayers()">START!</button>-->
             <button id="startNewGame">START!</button>
 
         </div>
         <div id="canvas" class="center">
             <!-- <canvas id="gameDesk" style="border:1px solid #000000;"> -->
-            <!-- <canvas id="gameDesk" width="1100" height="1100" style="border:1px solid #000000;"> -->
             <!-- <canvas id="gameDesk" width="850" height="850" style="border:1px solid #000000;"> -->
             <canvas id="gameDesk" width="500" height="500" style="border:1px solid #000000;">
                 Tento prohlížeč nepodporuje HTML5 pláno! /
@@ -55,7 +45,6 @@
         let number = Math.floor(Math.random() * 6) + 1;
         dice.src = '/images/dice_sprites/' + number + '.png';
     </script>
-    <!-- <script src="main.js" type="module"> --> 
     <script type="module">
         import { Main } from './main.js';
         function startGameWithPlayers(){
@@ -65,15 +54,14 @@
             const player4Checked = document.getElementById("p4").checked;
 
             const selectedPlayers = [];
-            if (player1Checked) selectedPlayers.push("P1"); // Or a more meaningful value like "blue", selectedPlayers);
-            if (player2Checked) selectedPlayers.push("P2"); // "red"
-            if (player3Checked) selectedPlayers.push("P3"); // "yellow"
-            if (player4Checked) selectedPlayers.push("P4"); // "green"
+            if (player1Checked) selectedPlayers.push("P1"); 
+            if (player2Checked) selectedPlayers.push("P2"); 
+            if (player3Checked) selectedPlayers.push("P3"); 
+            if (player4Checked) selectedPlayers.push("P4"); 
 
-            console.log("Selected players:", selectedPlayers);  // Check the console
+            console.log("Selected players:", selectedPlayers); 
             const main = new Main();
             main.setPlayers(selectedPlayers);
-            // main.setPlayers(selectedPlayers);
         }
         document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('startNewGame').addEventListener('click', startGameWithPlayers); // Pass the function, don't call it
