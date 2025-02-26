@@ -37,6 +37,6 @@ DB | Čtení a zápis do databáze
 ### Class diagram
 ![classdiagram](ClassDiagram.svg)
 
-https://github.com/Pety-CZ/clobrdo
+<https://github.com/Pety-CZ/clobrdo>
 
-https://clobrdo.petrn.site/
+<https://clobrdo.petrn.online/>
